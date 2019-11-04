@@ -1,11 +1,20 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <DHT.h>
 
 // Data wire is conntec to the Arduino digital pin 4
 #define ONE_WIRE_BUS 4
 
+//Data wire connected to GPIO5
+#define DHT_PIN 2 
+#define DHTTYPE DHT11
+
 // Setup a oneWire instance to communicate with any OneWire devices
 OneWire oneWire(ONE_WIRE_BUS);
+
+//Setting up DHT instance
+DHT dht(DHT_PIN , DHTTYPE);
+
 
 // Pass our oneWire reference to Dallas Temperature sensor 
 DallasTemperature sensors(&oneWire);
@@ -17,13 +26,18 @@ float temp_deltaC;
 float temp_deltaF;
 float report_temp_deltaC;
 float report_temp_deltaF;
+float humidity;
 
 void setup(void)
 {
   // Start serial communication for debugging purposes
   Serial.begin(9600);
+  
   // Start up the library
+  
   sensors.begin();
+  
+  dht.begin();
 
 
   Serial.print("Locating devices...");
@@ -41,6 +55,12 @@ void loop(void){
   sensors.requestTemperatures(); 
 
 
+  //Call humidity sensors
+  humidity = dht.readHumidity();
+  Serial.print("Humidity = ");
+  Serial.print(humidity);
+  Serial.println(" %");
+  
   // Display temps for each sensor
 
   for (int i=0; i < deviceCount ; i++)
